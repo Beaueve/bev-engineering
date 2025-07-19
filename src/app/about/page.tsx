@@ -35,9 +35,12 @@ export default function Home() {
   const saOpacity = progress > 0.5 ? 1 : 0;
 
   return (
-    <main className="relative min-h-screen bg-black text-white overflow-hidden">
+    <main
+      className={`relative min-h-screen bg-black text-white overflow-hidden ${
+        darkMode ? "dark" : ""
+      }`}
+    >
       <div className="fixed top-2 left-2">Parent: {scrollY}</div>
-      <GridFloor scrollY={scrollY} />
 
       {/* Theme Toggle */}
       <button
@@ -48,29 +51,31 @@ export default function Home() {
         {darkMode ? "☀️" : "🌙"}
       </button>
 
-			
       <div
         ref={containerRef}
-        className="relative h-screen overflow-y-scroll snap-y snap-mandatory transition-colors duration-300"
+        className="relative h-screen overflow-y-scroll snap-y snap-mandatory transition-colors duration-300 bg-white text-black dark:bg-black dark:text-white"
       >
-        <section className="h-screen snap-start flex items-center justify-center px-8">
-          <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
-          <p className="mt-4 text-lg">
-            Building the future with vanishing-point grids.
-          </p>
-        </section>
-        <section className="h-screen snap-start flex items-center justify-center px-8">
-          <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
-          <p className="mt-4 text-lg">
-            Building the future with vanishing-point grids.
-          </p>
-        </section>
-        <section className="h-screen snap-start flex items-center justify-center px-8">
-          <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
-          <p className="mt-4 text-lg">
-            Building the future with vanishing-point grids.
-          </p>
-        </section>
+        {darkMode && <GridFloor scrollY={scrollY} />}
+        <div className="absolute z-50">
+          <section className="h-screen snap-start flex items-center justify-center px-8">
+            <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
+            <p className="mt-4 text-lg">
+              Building the future with vanishing-point grids.
+            </p>
+          </section>
+          <section className="h-screen snap-start flex items-center justify-center px-8">
+            <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
+            <p className="mt-4 text-lg">
+              Building the future with vanishing-point grids.
+            </p>
+          </section>
+          <section className="h-screen snap-start flex items-center justify-center px-8">
+            <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
+            <p className="mt-4 text-lg">
+              Building the future with vanishing-point grids.
+            </p>
+          </section>
+        </div>
       </div>
     </main>
   );

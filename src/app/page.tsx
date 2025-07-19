@@ -40,10 +40,8 @@ export default function Home() {
     <main className="relative isolate overflow-hidden [webkit-overflow-scrolling:touch]">
       {/* Grid behind everything - ONLY render in dark mode */}
       {/* {darkMode && />} */}
-			<div className="bg-fade" >
-      <GridFloor scrollY={scrollY} />
-
-			</div>
+      { darkMode && <GridFloor scrollY={scrollY} />}
+			
       {/* Scrollable container */}
       <div
         ref={containerRef}
