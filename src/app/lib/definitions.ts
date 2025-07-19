@@ -1,0 +1,1 @@
+// Here the types that are retrieved from a db can be defined
