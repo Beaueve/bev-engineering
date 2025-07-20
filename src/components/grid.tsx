@@ -12,28 +12,74 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
 
-    // remove old lines
-    svg.selectAll("line").remove();
+    // clear old content
+    svg.selectAll("*").remove();
 
-    // logical drawing dimensions
     const width = 600;
     const height = 600;
+    const gridColor = `rgb(140,30,255)`;
+
+    // --- defs: gradient + mask ---
+    const defs = svg.append("defs");
+
+    const grad = defs
+      .append("linearGradient")
+      .attr("id", "fadeGrad")
+      // ensure the gradient coords are in SVG pixels, not 0–1
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", height);
+
+    grad
+      .append("stop")
+      .attr("offset", "50%")
+      .attr("stop-color", "white")
+      .attr("stop-opacity", 0);
+
+    grad
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "white")
+      .attr("stop-opacity", 1);
+
+    // make the mask span 600×600 in user space
+    const mask = defs
+      .append("mask")
+      .attr("id", "fadeMask")
+      .attr("maskUnits", "userSpaceOnUse");
+
+    mask
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("fill", "url(#fadeGrad)");
+
+    // wrap all your lines in a masked <g>
+    const gridLayer = svg.append("g").attr("mask", "url(#fadeMask)");
 
     // --- radial spokes ---
-    const numLines = 18;
+    const numLines = 25;
     const radius = 10000;
     const centerX = width / 2;
     const centerY = height / 2;
-    const gridColor = `rgb(140,30,255)`;
 
-    const radialData = d3.range(numLines).map((i) => ({
-      // i/(numLines-1) goes from 0 to 1, so the last value is 1*π = π
-      angle: (i / (numLines - 1)) * Math.PI,
+    const angleScale = d3
+      .scaleLog()
+      .domain([numLines, 1])
+      .range([0, Math.PI / 2]);
+
+    const radialDataRight = d3.range(1, numLines + 1).map((i) => ({
+      angle: angleScale(i),
     }));
-
-    svg
+    const radialDataLeft = [...radialDataRight].reverse().map((d) => {
+      const deg = (d.angle * 180) / Math.PI; // rad → deg
+      return { angle: ((180 - deg) * Math.PI) / 180 }; // back to rad
+    });
+    gridLayer
       .selectAll(".spoke")
-      .data(radialData)
+      .data([...radialDataLeft, ...radialDataRight])
       .enter()
       .append("line")
       .attr("class", "spoke")
@@ -52,11 +98,16 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
       .range([height, height / 2])
       .clamp(true);
 
-    const horizData = d3.range(numHoriz).map((i) => ({
-      y: logScale(i),
+    const step = Math.abs(logScale(2) - logScale(1));
+
+    const offset = ((scrollY /10  % step) + step) % step;
+
+    // generate your y’s on the fly, shifted by offset
+    const horizData = d3.range(1, numHoriz + 1).map((i) => ({
+      y: logScale(i) + offset,
     }));
 
-    svg
+    gridLayer
       .selectAll(".hline")
       .data(horizData)
       .enter()
