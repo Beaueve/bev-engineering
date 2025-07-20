@@ -92,20 +92,51 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
 
     // --- horizontal grid lines ---
     const numHoriz = 15;
-    const logScale = d3
-      .scaleLog()
-      .domain([1, numHoriz])
-      .range([height, height / 2])
-      .clamp(true);
 
-    const step = Math.abs(logScale(2) - logScale(1));
+    interface ShiftedPoint {
+      y: number;
+    }
 
-    const offset = ((scrollY /10  % step) + step) % step;
+    function generateLogShiftedPoints(
+      y: number,
+      n: number = 10,
+      min: number = 1,
+      max: number = Math.E,
+      reverse: boolean = false
+    ): ShiftedPoint[] {
+      const cycleLen = n - 1;
+      const frac = y - Math.floor(y);
+      const offset = (frac % 1) * cycleLen;
 
-    // generate your y’s on the fly, shifted by offset
-    const horizData = d3.range(1, numHoriz + 1).map((i) => ({
-      y: logScale(i) + offset,
-    }));
+      // set up log scale for the “normal” case
+      const logScale = d3
+        .scaleLog<number, number>()
+        .domain([min, max])
+        .range([0, 1]);
+
+      return Array.from({ length: n }, (_, i) => {
+        // continuous, wrapping index
+        const raw = (i + offset) % cycleLen;
+        const tNorm = raw / cycleLen; // in [0,1]
+
+        // pick your easing:
+        const value = reverse
+          ? // concave‑down easing: large gaps at start, small at end
+            min + (max - min) * (1 - Math.pow(1 - tNorm, 2))
+          : // log‑spacing: small gaps at start, large at end
+            logScale.invert(tNorm);
+
+        return { y: value };
+      });
+    }
+
+    const horizData = generateLogShiftedPoints(
+      scrollY / 3000,
+      numHoriz,
+      height,
+      height / 2,
+      true
+    );
 
     gridLayer
       .selectAll(".hline")
