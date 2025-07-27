@@ -1,3 +1,4 @@
+"use client";
 import { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
@@ -153,7 +154,7 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
   }, [scrollY]);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="fixed inset-0 z-1 pointer-events-none bg-black">
       <svg
         ref={svgRef}
         viewBox="0 0 600 600"

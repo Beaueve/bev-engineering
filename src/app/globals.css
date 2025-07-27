@@ -48,13 +48,58 @@ body {
 } */
 
 @layer utilities {
-   .bg-grid {
-    background-image:
-      linear-gradient(to right, rgba(140,30,255,0.7) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(140,30,255,0.7) 1px, transparent 1px);
+  .bg-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(140, 30, 255, 0.7) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(140, 30, 255, 0.7) 1px, transparent 1px);
     background-size: 40px 40px;
     filter: drop-shadow(0 0 5px #8c1eff);
   }
-
 }
 
+@layer components {
+  .sidebar-nav {
+    @apply top-0 left-0 z-50 text-white flex pointer-events-auto;
+  }
+
+  /* 2. Mobile (≤603px): horizontal top bar */
+  @media (max-width: 700px) {
+    .sidebar-nav {
+      @apply fixed z-100 w-full flex-row h-20 justify-around p-2 gap-x-2;
+    }
+    .sidebar-nav button {
+      @apply flex-grow-1 py-5 text-sm rounded-md;
+    }
+  }
+
+  /* z-50 flex flex-col justify-evenly  text-white",
+            "p-4 space-y-2 */
+
+  /* 3. Desktop (≥604px): vertical sidebar */
+  @media (min-width: 701px) {
+    .sidebar-nav {
+      @apply h-svh flex flex-col justify-evenly p-4 w-40;
+    }
+    .sidebar-nav button {
+      @apply w-full py-5 text-sm rounded-md;
+    }
+  }
+
+  .chip-button {
+    @apply flex items-center justify-evenly space-x-2 px-6 py-2 rounded-full font-semibold transition-all duration-200;
+
+    /* Light mode */
+    @apply bg-gray-200 text-gray-800 active:bg-gray-400;
+
+    /* Dark mode */
+    @apply dark:bg-[#2a263f] dark:text-[#e0aaff] dark:active:bg-[#3e3455];
+
+    /* Neon glow on hover (only for fine pointers) */
+    @media (pointer: fine) {
+      @apply hover:dark:[box-shadow:0_0_8px_rgba(224,170,255,0.7)];
+    }
+  }
+}
