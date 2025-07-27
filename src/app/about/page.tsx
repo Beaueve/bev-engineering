@@ -1,5 +1,6 @@
 "use client";
 
+import Actor from "@/components/actor/actor";
 import GridFloor from "@/components/grid";
 import { useEffect, useState, useRef } from "react";
 
@@ -60,8 +61,10 @@ export default function Home() {
           <section className="h-screen snap-start flex items-center justify-center px-8">
             <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
             <p className="mt-4 text-lg">
-              Building the future with vanishing-point grids.
+              Building the future with vanishing-point grids
+
             </p>
+
           </section>
           <section className="h-screen snap-start flex items-center justify-center px-8">
             <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
