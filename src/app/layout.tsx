@@ -39,10 +39,9 @@ export default function RootLayout({
 
         {/* Main content scroll pane */}
         <div className="main-content flex-1 min-h-0 h-svh overflow-y-auto snap-y snap-mandatory text-black dark:text-white main-scroll-pane">
-          <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 hidden dark:block">
+          <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 hidden dark:block">
             <GridFloor />
           </div>
-
           {children}
         </div>
 

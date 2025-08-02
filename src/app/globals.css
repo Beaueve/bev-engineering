@@ -53,7 +53,7 @@ main > section {
   }
 
   .chip-button {
-    @apply flex items-center justify-evenly space-x-2 px-6 py-2 rounded-full font-semibold transition-all duration-200;
+    @apply flex items-center justify-evenly space-x-2 p-2 rounded-full font-semibold transition-all duration-200;
     @apply bg-gray-200 text-gray-800 active:bg-gray-400;
     @apply dark:bg-[#2a263f] dark:text-[#e0aaff] dark:active:bg-[#3e3455];
     @media (pointer: fine) {
