@@ -2,6 +2,7 @@
 
 import Actor from "@/components/actor/actor";
 import GridFloor from "@/components/grid";
+import Section from "@/components/section/section";
 import clsx from "clsx";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
@@ -22,14 +23,23 @@ export default function Home() {
   }, []);
 
   return (
-    <main
-      className={`relative h-dvh overflow-hidden ${darkMode ? "dark" : ""}`}
-    >
-      <div className="w-40">
-        <Link className="chip-button" href="/">
-          Back
-        </Link>
-      </div>
-    </main>
+    <>
+      <Section id="section1" title="EV Charging Infrastructure">
+        <div className="container mx-auto px-4 py-8 flex flex-wrap justify-between gap-6">
+          <Actor name="EVSE" />
+          <Actor name="EV" />
+          <Actor name="CSMS" />
+          <Actor name="CSMS" />
+          <Actor name="CSMS" />
+          <Actor name="CSMS" />
+        </div>
+        <div className="text-center">
+          <h1 className="text-5xl font-bold">EV Charging Infrastructure</h1>
+          <p className="mt-4 text-lg">
+            Building the future with vanishing-point grids.
+          </p>
+        </div>
+      </Section>
+    </>
   );
 }

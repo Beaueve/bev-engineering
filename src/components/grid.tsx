@@ -1,82 +1,73 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-
-interface GridFloorProps {
-  scrollY: number;
-}
-
-export default function GridFloor({ scrollY }: GridFloorProps) {
+export default function GridFloor() {
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const scrollEl = document.querySelector(".main-content");
+    if (!scrollEl) return;
+
+    const handler = () => {
+      setScrollY((scrollEl as HTMLElement).scrollTop);
+    };
+    scrollEl.addEventListener("scroll", handler);
+    handler();
+    return () => scrollEl.removeEventListener("scroll", handler);
+  }, []);
 
   useEffect(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
-
-    // clear old content
     svg.selectAll("*").remove();
-
     const width = 600;
     const height = 600;
     const gridColor = `rgb(140,30,255)`;
-
-    // --- defs: gradient + mask ---
     const defs = svg.append("defs");
-
     const grad = defs
       .append("linearGradient")
       .attr("id", "fadeGrad")
-      // ensure the gradient coords are in SVG pixels, not 0–1
       .attr("gradientUnits", "userSpaceOnUse")
       .attr("x1", 0)
       .attr("y1", 0)
       .attr("x2", 0)
       .attr("y2", height);
-
     grad
       .append("stop")
       .attr("offset", "50%")
       .attr("stop-color", "white")
       .attr("stop-opacity", 0);
-
     grad
       .append("stop")
       .attr("offset", "100%")
       .attr("stop-color", "white")
       .attr("stop-opacity", 1);
-
-    // make the mask span 600×600 in user space
     const mask = defs
       .append("mask")
       .attr("id", "fadeMask")
       .attr("maskUnits", "userSpaceOnUse");
-
     mask
       .append("rect")
       .attr("width", width)
       .attr("height", height)
       .attr("fill", "url(#fadeGrad)");
-
-    // wrap all your lines in a masked <g>
     const gridLayer = svg.append("g").attr("mask", "url(#fadeMask)");
-
-    // --- radial spokes ---
     const numLines = 25;
     const radius = 10000;
     const centerX = width / 2;
     const centerY = height / 2;
-
     const angleScale = d3
       .scaleLog()
       .domain([numLines, 1])
       .range([0, Math.PI / 2]);
-
     const radialDataRight = d3.range(1, numLines + 1).map((i) => ({
       angle: angleScale(i),
     }));
     const radialDataLeft = [...radialDataRight].reverse().map((d) => {
-      const deg = (d.angle * 180) / Math.PI; // rad → deg
-      return { angle: ((180 - deg) * Math.PI) / 180 }; // back to rad
+      const deg = (d.angle * 180) / Math.PI;
+      return { angle: ((180 - deg) * Math.PI) / 180 };
     });
     gridLayer
       .selectAll(".spoke")
@@ -90,47 +81,30 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
       .attr("y2", (d) => centerY + radius * Math.sin(d.angle))
       .attr("stroke", gridColor)
       .attr("stroke-width", 1);
-
-    // --- horizontal grid lines ---
     const numHoriz = 15;
-
-    interface ShiftedPoint {
-      y: number;
-    }
-
     function generateLogShiftedPoints(
       y: number,
       n: number = 10,
       min: number = 1,
       max: number = Math.E,
       reverse: boolean = false
-    ): ShiftedPoint[] {
+    ) {
       const cycleLen = n - 1;
       const frac = y - Math.floor(y);
       const offset = (frac % 1) * cycleLen;
-
-      // set up log scale for the “normal” case
       const logScale = d3
         .scaleLog<number, number>()
         .domain([min, max])
         .range([0, 1]);
-
       return Array.from({ length: n }, (_, i) => {
-        // continuous, wrapping index
         const raw = (i + offset) % cycleLen;
-        const tNorm = raw / cycleLen; // in [0,1]
-
-        // pick your easing:
+        const tNorm = raw / cycleLen;
         const value = reverse
-          ? // concave‑down easing: large gaps at start, small at end
-            min + (max - min) * (1 - Math.pow(1 - tNorm, 2))
-          : // log‑spacing: small gaps at start, large at end
-            logScale.invert(tNorm);
-
+          ? min + (max - min) * (1 - Math.pow(1 - tNorm, 2))
+          : logScale.invert(tNorm);
         return { y: value };
       });
     }
-
     const horizData = generateLogShiftedPoints(
       scrollY / 3000,
       numHoriz,
@@ -138,7 +112,6 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
       height / 2,
       true
     );
-
     gridLayer
       .selectAll(".hline")
       .data(horizData)
@@ -154,7 +127,8 @@ export default function GridFloor({ scrollY }: GridFloorProps) {
   }, [scrollY]);
 
   return (
-    <div className="fixed inset-0 z-1 pointer-events-none bg-black">
+    <div className="bg-black">
+      <div className="absolute top-0 left-0 text-white">scrollY: {scrollY}</div>
       <svg
         ref={svgRef}
         viewBox="0 0 600 600"
